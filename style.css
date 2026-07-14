@@ -239,3 +239,26 @@ body.dark .category-tag {
 body.dark .date-tag {
     color: #aaa;
 }
+@media (max-width: 480px) {
+    body {
+        padding: 15px;
+        padding-top: 20px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    #taskList li {
+        font-size: 15px;
+    }
+
+    #taskList li button {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
