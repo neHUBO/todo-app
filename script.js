@@ -10,6 +10,31 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+const loginBox = document.getElementById('loginBox');
+const appBox = document.getElementById('appBox');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const loginBtn = document.getElementById('loginBtn');
+const loginError = document.getElementById('loginError');
+
+loginBtn.addEventListener('click', function() {
+    auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
+        .catch(function(error) {
+            loginError.textContent = 'Неверный email или пароль';
+        });
+});
+
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        loginBox.style.display = 'none';
+        appBox.style.display = 'block';
+    } else {
+        loginBox.style.display = 'block';
+        appBox.style.display = 'none';
+    }
+});
 const database = firebase.database();
 const tasksRef = database.ref('tasks');
 
