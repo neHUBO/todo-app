@@ -1,0 +1,208 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 350px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#taskInput {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#addBtn {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#addBtn:hover {
+    background-color: #45a049;
+}
+
+#taskList {
+    list-style: none;
+    padding: 0;
+}
+
+#taskList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f9f9f9;
+    margin-bottom: 8px;
+    border-radius: 5px;
+}
+
+#taskList li.done span {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.delete-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+#categorySelect {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.category-tag {
+    font-size: 12px;
+    color: #666;
+    background: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+.filter-area {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.filter-area select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-left: 5px;
+}
+.edit-btn {
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.edit-input {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+.save-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+#dateInput {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.date-tag {
+    font-size: 12px;
+    color: #666;
+    margin-left: 8px;
+}
+
+.overdue {
+    color: #ff4d4d;
+    font-weight: bold;
+}
+#exportBtn {
+    background: #217346;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+#exportBtn:hover {
+    background: #1a5c38;
+}
+#themeBtn {
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+body.dark {
+    background-color: #1e1e1e;
+}
+
+body.dark .container {
+    background: #2b2b2b;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+body.dark h1,
+body.dark .filter-area,
+body.dark label {
+    color: #f0f0f0;
+}
+
+body.dark #taskInput,
+body.dark #dateInput,
+body.dark #categorySelect,
+body.dark #filterSelect {
+    background: #3a3a3a;
+    color: #f0f0f0;
+    border: 1px solid #555;
+}
+
+body.dark #taskList li {
+    background: #3a3a3a;
+    color: #f0f0f0;
+}
+
+body.dark #taskList li.done span {
+    color: #888;
+}
+
+body.dark .category-tag {
+    background: #555;
+    color: #ddd;
+}
+
+body.dark .date-tag {
+    color: #aaa;
+}

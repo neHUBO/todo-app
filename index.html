@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список задач</title>
+    <link rel="stylesheet" href="style.css">
+</head><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<body>
+    <div class="container">
+        <h1>Мои задачи</h1><button id="exportBtn">Экспорт в Excel</button><button id="themeBtn">🌙 Тёмная тема</button>
+        <p id="counter">Выполнено: 0 из 0</p>
+        <div class="input-area">
+    <input type="text" id="taskInput" placeholder="Введите задачу...">
+    <input type="date" id="dateInput">
+    <select id="categorySelect">
+        <option value="Работа">Работа</option>
+        <option value="Дом">Дом</option>
+        <option value="Личное">Личное</option>
+    </select>
+    <button id="addBtn">Добавить</button>
+</div>
+       <div class="filter-area">
+    <label for="filterSelect">Показать:</label>
+    <select id="filterSelect">
+        <option value="Все">Все</option>
+        <option value="Работа">Работа</option>
+        <option value="Дом">Дом</option>
+        <option value="Личное">Личное</option>
+    </select>
+</div>
+<ul id="taskList"></ul>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
