@@ -1,3 +1,4 @@
+
 const firebaseConfig = {
     apiKey: "AIzaSyCRmrtvOg9uUNoB3ZACFNMLTH_unpDUP5k",
     authDomain: "nehubo.firebaseapp.com",
