@@ -1,3 +1,17 @@
+const firebaseConfig = {
+    apiKey: "AIzaSyCRmrtvOg9uUNoB3ZACFNMLTH_unpDUP5k",
+    authDomain: "nehubo.firebaseapp.com",
+    databaseURL: "https://nehubo-default-rtdb.firebaseio.com",
+    projectId: "nehubo",
+    storageBucket: "nehubo.firebasestorage.app",
+    messagingSenderId: "337424269841",
+    appId: "1:337424269841:web:53272b90ed1a5e9acbe7b0"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+const tasksRef = database.ref('tasks');
+
 const taskInput = document.getElementById('taskInput');
 const dateInput = document.getElementById('dateInput');
 const categorySelect = document.getElementById('categorySelect');
@@ -6,7 +20,7 @@ const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
 const counter = document.getElementById('counter');
 
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let tasks = [];
 
 addBtn.addEventListener('click', addTask);
 
@@ -17,6 +31,12 @@ taskInput.addEventListener('keypress', function(e) {
 });
 
 filterSelect.addEventListener('change', renderTasks);
+
+tasksRef.on('value', function(snapshot) {
+    const data = snapshot.val();
+    tasks = data ? Object.values(data) : [];
+    renderTasks();
+});
 
 function addTask() {
     const text = taskInput.value.trim();
@@ -31,12 +51,11 @@ function addTask() {
     taskInput.value = '';
     dateInput.value = '';
 
-    saveAndRender();
+    saveTasks();
 }
 
-function saveAndRender() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    renderTasks();
+function saveTasks() {
+    tasksRef.set(tasks);
 }
 
 function renderTasks() {
@@ -60,7 +79,7 @@ function renderTasks() {
 
         span.addEventListener('click', function() {
             tasks[index].done = !tasks[index].done;
-            saveAndRender();
+            saveTasks();
         });
 
         const tag = document.createElement('span');
@@ -90,7 +109,7 @@ function renderTasks() {
 
         deleteBtn.addEventListener('click', function() {
             tasks.splice(index, 1);
-            saveAndRender();
+            saveTasks();
         });
 
         li.appendChild(span);
@@ -119,14 +138,13 @@ function startEdit(li, task, index) {
     const saveBtn = document.createElement('button');
     saveBtn.textContent = 'Сохранить';
     saveBtn.className = 'save-btn';
-
     saveBtn.addEventListener('click', function() {
         const newText = editInput.value.trim();
         if (newText !== '') {
             tasks[index].text = newText;
         }
         tasks[index].dueDate = editDate.value;
-        saveAndRender();
+        saveTasks();
     });
 
     editInput.addEventListener('keypress', function(e) {
@@ -140,41 +158,33 @@ function startEdit(li, task, index) {
     li.appendChild(saveBtn);
     editInput.focus();
 }
+
 function updateCounter() {
     const total = tasks.length;
     const done = tasks.filter(function(t) { return t.done; }).length;
     counter.textContent = 'Выполнено: ' + done + ' из ' + total;
 }
 
-renderTasks();
-
 const exportBtn = document.getElementById('exportBtn');
 
-if (exportBtn) {
-    exportBtn.addEventListener('click', function() {
-        const data = tasks.map(function(task) {
-            return {
-                'Задача': task.text,
-                'Категория': task.category,
-                'Срок': task.dueDate || '—',
-                'Статус': task.done ? 'Выполнено' : 'Не выполнено'
-            };
-        });
-
-        const worksheet = XLSX.utils.json_to_sheet(data);
-
-        worksheet['!cols'] = [
-            { wch: 30 },
-            { wch: 15 },
-            { wch: 15 },
-            { wch: 18 }
-        ];
-
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Задачи');
-        XLSX.writeFile(workbook, 'мои_задачи.xlsx');
+exportBtn.addEventListener('click', function() {
+    const data = tasks.map(function(task) {
+        return {
+            'Задача': task.text,
+            'Категория': task.category,
+            'Срок': task.dueDate || '—',
+            'Статус': task.done ? 'Выполнено' : 'Не выполнено'
+        };
     });
-}
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    worksheet['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 18 }];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Задачи');
+    XLSX.writeFile(workbook, 'мои_задачи.xlsx');
+});
+
 const themeBtn = document.getElementById('themeBtn');
 
 if (localStorage.getItem('theme') === 'dark') {
