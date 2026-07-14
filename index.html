@@ -8,8 +8,16 @@
 </head><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <body>
-    <div class="container">
+    <div class="container" id="loginBox">
+    <h1>Вход</h1>
+    <input type="email" id="emailInput" placeholder="Email">
+    <input type="password" id="passwordInput" placeholder="Пароль">
+    <button id="loginBtn">Войти</button>
+    <p id="loginError" style="color: red;"></p>
+</div>
+<div class="container" id="appBox" style="display: none;">
         <h1>Мои задачи</h1><button id="exportBtn">Экспорт в Excel</button><button id="themeBtn">🌙 Тёмная тема</button>
         <p id="counter">Выполнено: 0 из 0</p>
         <div class="input-area">
@@ -34,5 +42,3 @@
 <ul id="taskList"></ul>
     </div>
     <script src="script.js"></script>
-</body>
-</html>
