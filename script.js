@@ -20,6 +20,11 @@ const loginBtn = document.getElementById('loginBtn');
 const loginError = document.getElementById('loginError');
 const roleGreeting = document.getElementById('roleGreeting');
 const managerView = document.getElementById('managerView');
+const logoutBtn = document.getElementById('logoutBtn');
+
+logoutBtn.addEventListener('click', function() {
+    auth.signOut();
+});
 const employeeView = document.getElementById('employeeView');
 const employeeSelect = document.getElementById('employeeSelect');
 const managerTaskList = document.getElementById('managerTaskList');
