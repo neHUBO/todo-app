@@ -18,27 +18,25 @@
     <p id="loginError" style="color: red;"></p>
 </div>
 <div class="container" id="appBox" style="display: none;">
-        <h1>Мои задачи</h1><button id="exportBtn">Экспорт в Excel</button><button id="themeBtn">🌙 Тёмная тема</button>
-        <p id="counter">Выполнено: 0 из 0</p>
+  <p id="roleGreeting"></p>
+
+    <div id="managerView" style="display: none;">
+        <h2>Поставить задачу</h2>
         <div class="input-area">
-    <input type="text" id="taskInput" placeholder="Введите задачу...">
-    <input type="date" id="dateInput">
-    <select id="categorySelect">
-        <option value="Работа">Работа</option>
-        <option value="Дом">Дом</option>
-        <option value="Личное">Личное</option>
-    </select>
-    <button id="addBtn">Добавить</button>
-</div>
-       <div class="filter-area">
-    <label for="filterSelect">Показать:</label>
-    <select id="filterSelect">
-        <option value="Все">Все</option>
-        <option value="Работа">Работа</option>
-        <option value="Дом">Дом</option>
-        <option value="Личное">Личное</option>
-    </select>
-</div>
-<ul id="taskList"></ul>
+            <input type="text" id="taskInput" placeholder="Введите задачу...">
+            <input type="date" id="dateInput">
+            <select id="employeeSelect"></select>
+            <button id="addBtn">Добавить</button>
+        </div>
+        <ul id="managerTaskList"></ul>
+    </div>
+
+    <div id="employeeView" style="display: none;">
+        <p id="counter">Выполнено: 0 из 0</p>
+        <ul id="taskList"></ul>
+    </div>  
     </div>
     <script src="script.js"></script>
+</body>
+</html>
+  
