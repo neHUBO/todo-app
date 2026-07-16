@@ -1,4 +1,3 @@
-
 const firebaseConfig = {
     apiKey: "AIzaSyCRmrtvOg9uUNoB3ZACFNMLTH_unpDUP5k",
     authDomain: "nehubo.firebaseapp.com",
@@ -11,6 +10,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const database = firebase.database();
 
 const loginBox = document.getElementById('loginBox');
 const appBox = document.getElementById('appBox');
@@ -18,6 +18,13 @@ const emailInput = document.getElementById('emailInput');
 const passwordInput = document.getElementById('passwordInput');
 const loginBtn = document.getElementById('loginBtn');
 const loginError = document.getElementById('loginError');
+const roleGreeting = document.getElementById('roleGreeting');
+const managerView = document.getElementById('managerView');
+const employeeView = document.getElementById('employeeView');
+const employeeSelect = document.getElementById('employeeSelect');
+const managerTaskList = document.getElementById('managerTaskList');
+
+let currentUserId = null;
 
 loginBtn.addEventListener('click', function() {
     auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
@@ -30,186 +37,130 @@ auth.onAuthStateChanged(function(user) {
     if (user) {
         loginBox.style.display = 'none';
         appBox.style.display = 'block';
+        currentUserId = user.uid;
+
+        database.ref('users/' + user.uid).once('value').then(function(snapshot) {
+            const userData = snapshot.val();
+            if (!userData) {
+                roleGreeting.textContent = 'Роль не найдена для этого пользователя';
+                return;
+            }
+
+            roleGreeting.textContent = 'Здравствуйте, ' + userData.name + ' (' + userData.role + ')';
+
+            if (userData.role === 'manager') {
+                managerView.style.display = 'block';
+                employeeView.style.display = 'none';
+                loadEmployeesList();
+                loadManagerTasks();
+            } else {
+                managerView.style.display = 'none';
+                employeeView.style.display = 'block';
+                loadEmployeeTasks();
+            }
+        });
     } else {
         loginBox.style.display = 'block';
         appBox.style.display = 'none';
     }
 });
-const database = firebase.database();
-const tasksRef = database.ref('tasks');
 
-const taskInput = document.getElementById('taskInput');
-const dateInput = document.getElementById('dateInput');
-const categorySelect = document.getElementById('categorySelect');
-const filterSelect = document.getElementById('filterSelect');
-const addBtn = document.getElementById('addBtn');
-const taskList = document.getElementById('taskList');
-const counter = document.getElementById('counter');
+function loadEmployeesList() {
+    database.ref('users').once('value').then(function(snapshot) {
+        const users = snapshot.val();
+        employeeSelect.innerHTML = '';
+        for (const uid in users) {
+            if (users[uid].role === 'employee') {
+                const option = document.createElement('option');
+                option.value = uid;
+                option.textContent = users[uid].name;
+                employeeSelect.appendChild(option);
+            }
+        }
+    });
+}
 
-let tasks = [];
+document.getElementById('addBtn').addEventListener('click', function() {
+    const text = document.getElementById('taskInput').value.trim();
+    const dueDate = document.getElementById('dateInput').value;
+    const assignedTo = employeeSelect.value;
 
-addBtn.addEventListener('click', addTask);
-
-taskInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        addTask();
-    }
-});
-
-filterSelect.addEventListener('change', renderTasks);
-
-tasksRef.on('value', function(snapshot) {
-    const data = snapshot.val();
-    tasks = data ? Object.values(data) : [];
-    renderTasks();
-});
-
-function addTask() {
-    const text = taskInput.value.trim();
-    const category = categorySelect.value;
-    const dueDate = dateInput.value;
-
-    if (text === '') {
+    if (text === '' || !assignedTo) {
         return;
     }
 
-    tasks.push({ text: text, category: category, dueDate: dueDate, done: false });
-    taskInput.value = '';
-    dateInput.value = '';
-
-    saveTasks();
-}
-
-function saveTasks() {
-    tasksRef.set(tasks);
-}
-
-function renderTasks() {
-    taskList.innerHTML = '';
-
-    const filter = filterSelect.value;
-    const today = new Date().toISOString().split('T')[0];
-
-    tasks.forEach(function(task, index) {
-        if (filter !== 'Все' && task.category !== filter) {
-            return;
-        }
-
-        const li = document.createElement('li');
-        if (task.done) {
-            li.classList.add('done');
-        }
-
-        const span = document.createElement('span');
-        span.textContent = task.text;
-
-        span.addEventListener('click', function() {
-            tasks[index].done = !tasks[index].done;
-            saveTasks();
-        });
-
-        const tag = document.createElement('span');
-        tag.textContent = task.category;
-        tag.className = 'category-tag';
-
-        const dateTag = document.createElement('span');
-        dateTag.className = 'date-tag';
-        if (task.dueDate) {
-            dateTag.textContent = 'до ' + task.dueDate;
-            if (task.dueDate < today && !task.done) {
-                dateTag.classList.add('overdue');
-            }
-        }
-
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Изменить';
-        editBtn.className = 'edit-btn';
-
-        editBtn.addEventListener('click', function() {
-            startEdit(li, task, index);
-        });
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Удалить';
-        deleteBtn.className = 'delete-btn';
-
-        deleteBtn.addEventListener('click', function() {
-            tasks.splice(index, 1);
-            saveTasks();
-        });
-
-        li.appendChild(span);
-        li.appendChild(tag);
-        li.appendChild(dateTag);
-        li.appendChild(editBtn);
-        li.appendChild(deleteBtn);
-        taskList.appendChild(li);
+    database.ref('tasks').push({
+        text: text,
+        dueDate: dueDate,
+        assignedTo: assignedTo,
+        createdBy: currentUserId,
+        done: false
     });
 
-    updateCounter();
-}
-
-function startEdit(li, task, index) {
-    li.innerHTML = '';
-
-    const editInput = document.createElement('input');
-    editInput.type = 'text';
-    editInput.value = task.text;
-    editInput.className = 'edit-input';
-
-    const editDate = document.createElement('input');
-    editDate.type = 'date';
-    editDate.value = task.dueDate || '';
-
-    const saveBtn = document.createElement('button');
-    saveBtn.textContent = 'Сохранить';
-    saveBtn.className = 'save-btn';
-    saveBtn.addEventListener('click', function() {
-        const newText = editInput.value.trim();
-        if (newText !== '') {
-            tasks[index].text = newText;
-        }
-        tasks[index].dueDate = editDate.value;
-        saveTasks();
-    });
-
-    editInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            saveBtn.click();
-        }
-    });
-
-    li.appendChild(editInput);
-    li.appendChild(editDate);
-    li.appendChild(saveBtn);
-    editInput.focus();
-}
-
-function updateCounter() {
-    const total = tasks.length;
-    const done = tasks.filter(function(t) { return t.done; }).length;
-    counter.textContent = 'Выполнено: ' + done + ' из ' + total;
-}
-
-const exportBtn = document.getElementById('exportBtn');
-
-exportBtn.addEventListener('click', function() {
-    const data = tasks.map(function(task) {
-        return {
-            'Задача': task.text,
-            'Категория': task.category,
-            'Срок': task.dueDate || '—',
-            'Статус': task.done ? 'Выполнено' : 'Не выполнено'
-        };
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    worksheet['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 18 }];
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Задачи');
-    XLSX.writeFile(workbook, 'мои_задачи.xlsx');
+    document.getElementById('taskInput').value = '';
+    document.getElementById('dateInput').value = '';
 });
+
+function loadManagerTasks() {
+    database.ref('tasks').on('value', function(snapshot) {
+        const tasks = snapshot.val() || {};
+        managerTaskList.innerHTML = '';
+
+        database.ref('users').once('value').then(function(usersSnap) {
+            const users = usersSnap.val() || {};
+
+            for (const taskId in tasks) {
+                const task = tasks[taskId];
+                const employeeName = users[task.assignedTo] ? users[task.assignedTo].name : '???';
+                const li = document.createElement('li');
+                if (task.done) {
+                    li.classList.add('done');
+                }
+                li.textContent = employeeName + ': ' + task.text + (task.dueDate ? ' (до ' + task.dueDate + ')' : '');
+                managerTaskList.appendChild(li);
+            }
+        });
+    });
+}
+
+function loadEmployeeTasks() {
+    database.ref('tasks').on('value', function(snapshot) {
+        const allTasks = snapshot.val() || {};
+        const taskList = document.getElementById('taskList');
+        const counter = document.getElementById('counter');
+        taskList.innerHTML = '';
+
+        let total = 0;
+        let done = 0;
+
+        for (const taskId in allTasks) {
+            const task = allTasks[taskId];
+            if (task.assignedTo !== currentUserId) {
+                continue;
+            }
+
+            total++;
+            if (task.done) done++;
+
+            const li = document.createElement('li');
+            if (task.done) {
+                li.classList.add('done');
+            }
+
+            const span = document.createElement('span');
+            span.textContent = task.text + (task.dueDate ? ' (до ' + task.dueDate + ')' : '');
+
+            span.addEventListener('click', function() {
+                database.ref('tasks/' + taskId + '/done').set(!task.done);
+            });
+
+            li.appendChild(span);
+            taskList.appendChild(li);
+        }
+
+        counter.textContent = 'Выполнено: ' + done + ' из ' + total;
+    });
+}
 
 const themeBtn = document.getElementById('themeBtn');
 
